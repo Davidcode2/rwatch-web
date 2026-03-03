@@ -1,4 +1,3 @@
-import * as React from "react"
 import { Line, LineChart as RechartsLineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
 
 import { cn } from "@/lib/utils"
@@ -19,8 +18,9 @@ interface ChartConfig {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface LineChartProps {
-  data: Array<Record<string, number | string>>
+  data: Array<Record<string, any>>
   config: ChartConfig
   xAxisKey: string
   className?: string
@@ -53,7 +53,7 @@ function LineChart({
             tick={{ fill: "currentColor", fontSize: 12 }}
             tickLine={{ stroke: "currentColor" }}
             axisLine={{ stroke: "currentColor" }}
-            tickFormatter={(value) => formatBytes(value)}
+            tickFormatter={(value) => formatBytes(value || 0)}
           />
           {showTooltip && (
             <Tooltip
@@ -64,7 +64,7 @@ function LineChart({
               }}
               labelStyle={{ color: "hsl(var(--foreground))" }}
               itemStyle={{ color: "hsl(var(--foreground))" }}
-              formatter={(value: number) => formatBytes(value)}
+              formatter={(value: number | undefined) => formatBytes(value || 0)}
             />
           )}
           {showLegend && <Legend />}
