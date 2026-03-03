@@ -12,10 +12,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - rwatch-web.davidcode2.com
+        - telemetry.jakob-lingel.dev
       secretName: rwatch-web-tls
   rules:
-    - host: rwatch-web.davidcode2.com
+    - host: telemetry.jakob-lingel.dev
       http:
         paths:
           - path: /
