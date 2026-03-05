@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr
-  IMAGE_NAME: ${{ github.repository }}-web
+  IMAGE_NAME: rwatch-web
   APP_OF_APPS_REPO: app-of-apps
   DEPLOYMENT_DIR: rwatch-web
   DEPLOYMENT_FILE: 02-deployment.yaml
