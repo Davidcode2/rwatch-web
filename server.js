@@ -1,7 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-const http = require('http');
-const path = require('path');
+import express from 'express';
+import cors from 'cors';
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES modules don't have __dirname, so we create it
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
