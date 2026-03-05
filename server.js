@@ -115,7 +115,7 @@ if (NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
 
   // Handle SPA routing - serve index.html for all non-API routes
-  app.get('*', (req, res) => {
+  app.get('/*', (req, res) => {
     if (!req.path.startsWith('/api')) {
       res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     }
