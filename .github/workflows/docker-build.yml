@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr
-  IMAGE_NAME: rwatch-web
+  IMAGE_NAME: davidcode2/rwatch-web
   APP_OF_APPS_REPO: app-of-apps
   DEPLOYMENT_DIR: rwatch-web
   DEPLOYMENT_FILE: 02-deployment.yaml
@@ -84,7 +84,6 @@ jobs:
         with:
           images: ghcr.io/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ needs.bump-version.outputs.version }}
             type=sha,enable=true
 
@@ -121,8 +120,7 @@ jobs:
       - name: Update deployment image tag
         run: |
           VERSION=${{ needs.bump-version.outputs.version }}
-          OWNER_LC=$(echo "${{ env.GITHUB_OWNER }}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s|image: ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}:.*|image: ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}:${VERSION}|g" ${{ env.DEPLOYMENT_DIR }}/${{ env.DEPLOYMENT_FILE }}
+          sed -i "s|image: ghcr.io/${{ env.IMAGE_NAME }}:.*|image: ghcr.io/${{ env.IMAGE_NAME }}:${VERSION}|g" ${{ env.DEPLOYMENT_DIR }}/${{ env.DEPLOYMENT_FILE }}
           echo "Updated image tag to ${VERSION}"
 
       - name: Commit and push deployment update
