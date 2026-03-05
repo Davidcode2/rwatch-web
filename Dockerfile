@@ -32,6 +32,9 @@ COPY --from=builder /app/dist ./dist
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
 
+# Fix permissions for static files
+RUN chown -R nextjs:nodejs /app/dist
+
 USER nextjs
 
 EXPOSE 3001
