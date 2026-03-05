@@ -13,6 +13,7 @@ env:
   APP_OF_APPS_REPO: app-of-apps
   DEPLOYMENT_DIR: rwatch-web
   DEPLOYMENT_FILE: 02-deployment.yaml
+  GITHUB_OWNER: Davidcode2
 
 jobs:
   bump-version:
@@ -102,16 +103,26 @@ jobs:
     needs: [bump-version, build]
     if: github.event_name != 'pull_request'
     steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ env.GITHUB_OWNER }}
+          repositories: ${{ env.APP_OF_APPS_REPO }}
+
       - name: Checkout app-of-apps repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository_owner }}/${{ env.APP_OF_APPS_REPO }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ env.GITHUB_OWNER }}/${{ env.APP_OF_APPS_REPO }}
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Update deployment image tag
         run: |
           VERSION=${{ needs.bump-version.outputs.version }}
-          sed -i "s|image: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:.*|image: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${VERSION}|g" ${{ env.DEPLOYMENT_DIR }}/${{ env.DEPLOYMENT_FILE }}
+          OWNER_LC=$(echo "${{ env.GITHUB_OWNER }}" | tr '[:upper:]' '[:lower:]')
+          sed -i "s|image: ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}:.*|image: ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}:${VERSION}|g" ${{ env.DEPLOYMENT_DIR }}/${{ env.DEPLOYMENT_FILE }}
           echo "Updated image tag to ${VERSION}"
 
       - name: Commit and push deployment update
