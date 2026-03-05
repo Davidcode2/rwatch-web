@@ -9,7 +9,8 @@ on:
 
 env:
   REGISTRY: ghcr
-  IMAGE_NAME: davidcode2/rwatch-web
+  IMAGE_NAME: ${{ github.repository }}-web
+  APP_REPO_NAME: rwatch-web
   APP_OF_APPS_REPO: app-of-apps
   DEPLOYMENT_DIR: rwatch-web
   DEPLOYMENT_FILE: 02-deployment.yaml
@@ -118,16 +119,20 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Update deployment image tag
+        working-directory: ${{ env.DEPLOYMENT_DIR }}
         run: |
           VERSION=${{ needs.bump-version.outputs.version }}
-          sed -i "s|image: ghcr.io/${{ env.IMAGE_NAME }}:.*|image: ghcr.io/${{ env.IMAGE_NAME }}:${VERSION}|g" ${{ env.DEPLOYMENT_DIR }}/${{ env.DEPLOYMENT_FILE }}
+          OWNER_LC=$(echo "${{ env.GITHUB_OWNER }}" | tr '[:upper:]' '[:lower:]')
+          REPO_LC=$(echo "${{ env.APP_REPO_NAME }}" | tr '[:upper:]' '[:lower:]')
+          sed -i "s|image: ghcr.io/${OWNER_LC}/${REPO_LC}-web:.*|image: ghcr.io/${OWNER_LC}/${REPO_LC}-web:${VERSION}|g" ${{ env.DEPLOYMENT_FILE }}
           echo "Updated image tag to ${VERSION}"
 
       - name: Commit and push deployment update
+        working-directory: ${{ env.DEPLOYMENT_DIR }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ${{ env.DEPLOYMENT_DIR }}/${{ env.DEPLOYMENT_FILE }}
           git diff --exit-code && echo "No changes to commit" && exit 0
-          git commit -m "deploy: ${{ env.IMAGE_NAME }} v${{ needs.bump-version.outputs.version }}"
+          git add .
+          git commit -m "deploy: ${{ env.APP_REPO_NAME }} v${VERSION}"
           git push
