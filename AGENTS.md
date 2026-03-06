@@ -1,6 +1,6 @@
 # AGENTS.md - rwatch-web
 
-> Documentation for AI agents working on this project. Last updated: 2026-03-06
+> Documentation for AI agents working on this project. Last updated: 2026-03-06 (test setup flow added)
 
 ## Project Purpose & Architecture
 
@@ -119,6 +119,65 @@ npm start
 | `RWATCH_AGENT_SERVICE_HOST` | rwatch-agent.rwatch.svc.cluster.local | Agent service host (K8s) |
 | `RWATCH_AGENT_SERVICE_PORT` | 3000 | Agent service port |
 | `VITE_API_URL` | '' | Frontend API URL prefix (for dev proxy) |
+
+## Local Test Setup with Dummy Agent
+
+For local development and testing without a Kubernetes cluster, you can run the complete stack using the rwatch agent's dummy mode.
+
+### Prerequisites
+- Node.js 22+ and npm
+- Rust toolchain (for running the agent)
+
+### Test Setup Flow
+
+**Terminal 1 - Start the rwatch agent in dummy mode:**
+```bash
+cd /path/to/rwatch/rwatch
+source $HOME/.cargo/env  # if needed
+cargo run -p rwatch-agent -- --dummy
+# Agent runs on http://localhost:3000
+```
+
+**Terminal 2 - Start the Express backend:**
+```bash
+cd /path/to/rwatch-web
+API_URL=http://localhost:3000 node server.js
+# Backend proxy runs on http://localhost:3001
+```
+
+**Terminal 3 - Start the Vite dev server:**
+```bash
+cd /path/to/rwatch-web
+npm run dev
+# Frontend runs on http://localhost:5173 (or next available port)
+```
+
+### Verification
+
+Test the endpoints to verify everything is working:
+
+```bash
+# Agent health
+curl http://localhost:3000/health
+
+# Backend proxy (should return dummy metrics)
+curl http://localhost:3001/api/metrics/nodes
+curl http://localhost:3001/api/metrics/pods
+curl http://localhost:3001/api/metrics/summary
+
+# Frontend (should serve the React app)
+curl http://localhost:5173/
+```
+
+### What Dummy Mode Provides
+
+The dummy agent generates realistic simulated data:
+- **3 nodes** with varying CPU (2-4 cores) and memory (8-16 GB) capacities
+- **40-50 pods** distributed across namespaces: `default`, `kube-system`, `app-namespace`, `monitoring`
+- **Smooth variations** in metrics (±2% variation per request)
+- All endpoints return data in production format
+
+This setup allows frontend development without requiring a K8s cluster or real agents.
 
 ## Testing Approach
 
