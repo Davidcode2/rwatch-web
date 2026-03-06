@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, type ChartConfig } from "@/components/ui/chart";
 import { useMetrics } from "@/hooks/useMetrics";
+import { KubernetesMetrics } from "@/components/KubernetesMetrics";
 import { Activity, Server, MemoryStick, AlertCircle } from "lucide-react";
 
 const chartConfig: ChartConfig = {
@@ -177,6 +178,9 @@ export function Dashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Kubernetes Metrics */}
+      <KubernetesMetrics />
     </div>
   );
 }
