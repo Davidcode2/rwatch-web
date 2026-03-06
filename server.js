@@ -56,20 +56,21 @@ const apiProxy = createProxyMiddleware({
 app.use('/api', apiProxy);
 
 // Serve static files from the dist directory
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Serve index.html for all other routes (SPA support)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-// Health check endpoint
+// Health check endpoint - must be defined BEFORE the SPA fallback
 app.get('/health', (req, res) => {
   res.json({
     status: 'up',
     apiUrl: API_URL,
     timestamp: new Date().toISOString()
   });
+});
+
+// Serve static files from the dist directory
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Serve index.html for all other routes (SPA support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
