@@ -1,7 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { K8sMetricsResponse, PodsMetricsResponse, SummaryResponse } from '@/types/k8s';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
+
+export interface MetricsHistoryPoint {
+  timestamp: string;
+  cpuUsage: number; // Average CPU usage percentage across nodes
+  memoryUsage: number; // Average memory usage percentage across nodes
+  nodeCount: number;
+  podCount: number;
+}
+
+const MAX_HISTORY_POINTS = 60;
 
 export function useK8sMetrics() {
   const [nodesMetrics, setNodesMetrics] = useState<K8sMetricsResponse | null>(null);
@@ -9,6 +19,8 @@ export function useK8sMetrics() {
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<MetricsHistoryPoint[]>([]);
+  const historyRef = useRef<MetricsHistoryPoint[]>([]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -31,6 +43,18 @@ export function useK8sMetrics() {
       setNodesMetrics(nodesData);
       setPodsMetrics(podsData);
       setSummary(summaryData);
+
+      // Add to history
+      const newPoint: MetricsHistoryPoint = {
+        timestamp: new Date().toISOString(),
+        cpuUsage: summaryData.nodes?.cpuUsage ?? 0,
+        memoryUsage: summaryData.nodes?.memoryUsage ?? 0,
+        nodeCount: summaryData.nodes?.count ?? 0,
+        podCount: summaryData.pods?.count ?? 0,
+      };
+
+      historyRef.current = [...historyRef.current, newPoint].slice(-MAX_HISTORY_POINTS);
+      setHistory(historyRef.current);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -48,6 +72,7 @@ export function useK8sMetrics() {
     nodesMetrics, 
     podsMetrics, 
     summary, 
+    history,
     loading, 
     error, 
     refetch: fetchData 

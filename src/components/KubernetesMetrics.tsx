@@ -1,12 +1,15 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useK8sMetrics } from "@/hooks/useK8sMetrics";
-import { Server, Box, HardDrive } from "lucide-react";
+import { Server, Box, HardDrive, Cpu, Activity } from "lucide-react";
 import { NodesTable } from "./NodesTable";
 import { PodsTable } from "./PodsTable";
+import { K8sMetricsChart } from "./K8sMetricsChart";
 
 export function KubernetesMetrics() {
-  const { nodesMetrics, podsMetrics, summary, loading, error } = useK8sMetrics();
+  const { nodesMetrics, podsMetrics, summary, history, loading, error } = useK8sMetrics();
+  const [chartMetric, setChartMetric] = useState<"cpu" | "memory">("cpu");
 
   if (error) {
     return (
@@ -64,6 +67,54 @@ export function KubernetesMetrics() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Metrics Chart */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              Cluster Metrics Over Time
+            </CardTitle>
+            <CardDescription>
+              Historical CPU and memory usage trends
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setChartMetric("cpu")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                chartMetric === "cpu"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+              aria-pressed={chartMetric === "cpu"}
+            >
+              <Cpu className="h-3.5 w-3.5" />
+              CPU
+            </button>
+            <button
+              onClick={() => setChartMetric("memory")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                chartMetric === "memory"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+              aria-pressed={chartMetric === "memory"}
+            >
+              <HardDrive className="h-3.5 w-3.5" />
+              Memory
+            </button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <K8sMetricsChart
+            history={history}
+            metric={chartMetric}
+            loading={loading}
+          />
+        </CardContent>
+      </Card>
 
       {/* Tabs for Nodes and Pods */}
       <Tabs defaultValue="nodes" className="w-full">

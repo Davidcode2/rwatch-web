@@ -49,6 +49,7 @@ describe('KubernetesMetrics Component', () => {
       nodesMetrics: mockNodesMetrics,
       podsMetrics: mockPodsMetrics,
       summary: mockSummary,
+      history: [],
       loading: false,
       error: null
     });
@@ -114,6 +115,7 @@ describe('KubernetesMetrics Component', () => {
       nodesMetrics: null,
       podsMetrics: null,
       summary: null,
+      history: [],
       loading: true,
       error: null
     });
@@ -129,6 +131,7 @@ describe('KubernetesMetrics Component', () => {
       nodesMetrics: null,
       podsMetrics: null,
       summary: null,
+      history: [],
       loading: false,
       error: 'Failed to connect to cluster'
     });
@@ -174,6 +177,7 @@ describe('KubernetesMetrics Component', () => {
       nodesMetrics: null,
       podsMetrics: null,
       summary: null,
+      history: [],
       loading: true,
       error: null
     });
@@ -195,6 +199,7 @@ describe('KubernetesMetrics Component', () => {
       nodesMetrics: { nodes: [], timestamp: '2026-03-05T22:30:00Z' },
       podsMetrics: mockPodsMetrics,
       summary: { nodes: { count: 0, cpuUsage: 0, memoryUsage: 0 }, pods: { count: 1, cpuUsage: '100m', memoryUsage: '256Mi' } },
+      history: [],
       loading: false,
       error: null
     });
@@ -209,6 +214,7 @@ describe('KubernetesMetrics Component', () => {
       nodesMetrics: mockNodesMetrics,
       podsMetrics: { pods: [], timestamp: '2026-03-05T22:30:00Z' },
       summary: { nodes: { count: 1, cpuUsage: 22.5, memoryUsage: 34.2 }, pods: { count: 0, cpuUsage: '0m', memoryUsage: '0Mi' } },
+      history: [],
       loading: false,
       error: null
     });
