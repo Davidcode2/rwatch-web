@@ -14,13 +14,13 @@ const mockNodesMetrics: K8sMetricsResponse = {
   nodes: [
     {
       name: 'node-1',
-      cpu: { usage: '450m', usagePercentage: 22.5, capacity: '2000m' },
-      memory: { usage: '2048Mi', usagePercentage: 34.2, capacity: '6000Mi' }
+      cpu: { usage: '450m', usage_percentage: 22.5, capacity: '2000m' },
+      memory: { usage: '2048Mi', usage_percentage: 34.2, capacity: '6000Mi' }
     },
     {
       name: 'node-2',
-      cpu: { usage: '800m', usagePercentage: 40.0, capacity: '2000m' },
-      memory: { usage: '4096Mi', usagePercentage: 68.3, capacity: '6000Mi' }
+      cpu: { usage: '800m', usage_percentage: 40.0, capacity: '2000m' },
+      memory: { usage: '4096Mi', usage_percentage: 68.3, capacity: '6000Mi' }
     }
   ],
   timestamp: '2026-03-05T22:30:00Z'

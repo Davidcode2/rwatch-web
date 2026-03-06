@@ -9,13 +9,13 @@ import type { NodeMetrics } from '@/types/k8s';
 const mockNodes: NodeMetrics[] = [
   {
     name: 'node-1',
-    cpu: { usage: '450m', usagePercentage: 22.5, capacity: '2000m' },
-    memory: { usage: '2048Mi', usagePercentage: 34.2, capacity: '6000Mi' }
+    cpu: { usage: '450m', usage_percentage: 22.5, capacity: '2000m' },
+    memory: { usage: '2048Mi', usage_percentage: 34.2, capacity: '6000Mi' }
   },
   {
     name: 'node-2',
-    cpu: { usage: '800m', usagePercentage: 40.0, capacity: '2000m' },
-    memory: { usage: '4096Mi', usagePercentage: 68.3, capacity: '6000Mi' }
+    cpu: { usage: '800m', usage_percentage: 40.0, capacity: '2000m' },
+    memory: { usage: '4096Mi', usage_percentage: 68.3, capacity: '6000Mi' }
   }
 ];
 
@@ -78,8 +78,8 @@ describe('NodesTable Component', () => {
   it('should display high CPU usage with correct formatting', () => {
     const highCpuNode: NodeMetrics = {
       name: 'high-cpu-node',
-      cpu: { usage: '1900m', usagePercentage: 95.0, capacity: '2000m' },
-      memory: { usage: '5800Mi', usagePercentage: 96.7, capacity: '6000Mi' }
+      cpu: { usage: '1900m', usage_percentage: 95.0, capacity: '2000m' },
+      memory: { usage: '5800Mi', usage_percentage: 96.7, capacity: '6000Mi' }
     };
 
     render(<NodesTable nodes={[highCpuNode]} />);

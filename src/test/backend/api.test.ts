@@ -76,12 +76,12 @@ const createMockApp = () => {
         name: item.metadata?.name || 'unknown',
         cpu: {
           usage: cpuUsage,
-          usagePercentage: parseFloat(cpuPercentage.toFixed(1)),
+          usage_percentage: parseFloat(cpuPercentage.toFixed(1)),
           capacity: cpuCapacity
         },
         memory: {
           usage: memoryUsage,
-          usagePercentage: parseFloat(memoryPercentage.toFixed(1)),
+          usage_percentage: parseFloat(memoryPercentage.toFixed(1)),
           capacity: memoryCapacity
         }
       };
@@ -294,12 +294,12 @@ describe('API Contract - Backend Endpoints', () => {
             name: 'node-1',
             cpu: {
               usage: '450m',
-              usagePercentage: 22.5,
+              usage_percentage: 22.5,
               capacity: '2000m'
             },
             memory: {
               usage: '2048Mi',
-              usagePercentage: 34.13333333333333,
+              usage_percentage: 34.13333333333333,
               capacity: '6000Mi'
             }
           }
@@ -313,10 +313,10 @@ describe('API Contract - Backend Endpoints', () => {
       expect(response.nodes[0]).toHaveProperty('cpu');
       expect(response.nodes[0]).toHaveProperty('memory');
       expect(response.nodes[0].cpu).toHaveProperty('usage');
-      expect(response.nodes[0].cpu).toHaveProperty('usagePercentage');
+      expect(response.nodes[0].cpu).toHaveProperty('usage_percentage');
       expect(response.nodes[0].cpu).toHaveProperty('capacity');
       expect(response.nodes[0].memory).toHaveProperty('usage');
-      expect(response.nodes[0].memory).toHaveProperty('usagePercentage');
+      expect(response.nodes[0].memory).toHaveProperty('usage_percentage');
       expect(response.nodes[0].memory).toHaveProperty('capacity');
       expect(response).toHaveProperty('timestamp');
     });
@@ -327,8 +327,8 @@ describe('API Contract - Backend Endpoints', () => {
 
       const nodes = mockNodeMetrics.items?.map(item => ({
         name: item.metadata?.name || 'unknown',
-        cpu: { usage: '0m', usagePercentage: 0, capacity: '2000m' },
-        memory: { usage: '0Mi', usagePercentage: 0, capacity: '6000Mi' }
+        cpu: { usage: '0m', usage_percentage: 0, capacity: '2000m' },
+        memory: { usage: '0Mi', usage_percentage: 0, capacity: '6000Mi' }
       })) || [];
 
       expect(nodes).toHaveLength(0);
@@ -356,13 +356,13 @@ describe('API Contract - Backend Endpoints', () => {
           name: item.metadata?.name || 'unknown',
           cpu: {
             usage: cpuUsage,
-            usagePercentage: parseFloat(cpuPercentage.toFixed(1)),
+            usage_percentage: parseFloat(cpuPercentage.toFixed(1)),
             capacity: cpuCapacity
           }
         };
       }) || [];
 
-      expect(nodes[0].cpu.usagePercentage).toBe(25);
+      expect(nodes[0].cpu.usage_percentage).toBe(25);
       expect(nodes[0].cpu.capacity).toBe('2000m');
     });
   });

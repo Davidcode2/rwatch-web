@@ -18,12 +18,12 @@ GET /api/metrics/nodes
       "name": "node-1",
       "cpu": {
         "usage": "450m",
-        "usagePercentage": 22.5,
+        "usage_percentage": 22.5,
         "capacity": "2000m"
       },
       "memory": {
         "usage": "2048Mi",
-        "usagePercentage": 34.2,
+        "usage_percentage": 34.2,
         "capacity": "6000Mi"
       }
     }

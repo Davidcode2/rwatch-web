@@ -2,12 +2,12 @@ export interface NodeMetrics {
   name: string;
   cpu: {
     usage: string;
-    usagePercentage: number;
+    usage_percentage: number;
     capacity: string;
   };
   memory: {
     usage: string;
-    usagePercentage: number;
+    usage_percentage: number;
     capacity: string;
   };
 }

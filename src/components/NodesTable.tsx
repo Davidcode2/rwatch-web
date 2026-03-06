@@ -31,7 +31,7 @@ export function NodesTable({ nodes }: NodesTableProps) {
                 <div className="flex items-center gap-2">
                   <span>{node.cpu.usage}</span>
                   <span className="text-muted-foreground">
-                    ({node.cpu.usagePercentage.toFixed(1)}%)
+                    ({node.cpu.usage_percentage.toFixed(1)}%)
                   </span>
                 </div>
               </TableCell>
@@ -39,7 +39,7 @@ export function NodesTable({ nodes }: NodesTableProps) {
                 <div className="flex items-center gap-2">
                   <span>{node.memory.usage}</span>
                   <span className="text-muted-foreground">
-                    ({node.memory.usagePercentage.toFixed(1)}%)
+                    ({node.memory.usage_percentage.toFixed(1)}%)
                   </span>
                 </div>
               </TableCell>
