@@ -2,14 +2,26 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useK8sMetrics } from "@/hooks/useK8sMetrics";
-import { Server, Box, HardDrive, Cpu, Activity } from "lucide-react";
+import { Server, Box, HardDrive, Cpu, Activity, ListFilter } from "lucide-react";
 import { NodesTable } from "./NodesTable";
 import { PodsTable } from "./PodsTable";
 import { K8sMetricsChart } from "./K8sMetricsChart";
+import { UsagePieChart } from "./dashboard/UsagePieChart";
+
+type SortField = "name" | "cpu" | "memory";
+type SortOrder = "asc" | "desc";
 
 export function KubernetesMetrics() {
   const { nodesMetrics, podsMetrics, summary, history, loading, error } = useK8sMetrics();
   const [chartMetric, setChartMetric] = useState<"cpu" | "memory">("cpu");
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  const handleSortChange = (field: SortField, order: SortOrder) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
 
   if (error) {
     return (
@@ -25,7 +37,7 @@ export function KubernetesMetrics() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Nodes</CardTitle>
@@ -34,7 +46,7 @@ export function KubernetesMetrics() {
           <CardContent>
             <div className="text-2xl font-bold">{loading ? "..." : summary?.nodes.count || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {loading ? "..." : `${summary?.nodes?.cpuUsage?.toFixed(1) ?? '0.0'}% avg CPU`}
+              {loading ? "..." : `Active nodes`}
             </p>
           </CardContent>
         </Card>
@@ -57,13 +69,40 @@ export function KubernetesMetrics() {
             <CardTitle className="text-sm font-medium">Cluster Memory</CardTitle>
             <HardDrive className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? "..." : `${summary?.nodes?.memoryUsage?.toFixed(1) ?? '0.0'}%`}
+          <CardContent className="flex items-center gap-4">
+            <div className="flex-1">
+              <div className="text-2xl font-bold">
+                {loading ? "..." : `${summary?.nodes?.memoryUsage?.toFixed(1) ?? '0.0'}%`}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {loading ? "..." : `Avg usage across nodes`}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {loading ? "..." : `Avg usage across nodes`}
-            </p>
+            <UsagePieChart
+              percentage={loading ? 0 : summary?.nodes?.memoryUsage ?? 0}
+              size={48}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Average CPU Usage</CardTitle>
+            <Cpu className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent className="flex items-center gap-4">
+            <div className="flex-1">
+              <div className="text-2xl font-bold">
+                {loading ? "..." : `${summary?.nodes?.cpuUsage?.toFixed(1) ?? '0.0'}%`}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {loading ? "..." : `Across all nodes`}
+              </p>
+            </div>
+            <UsagePieChart
+              percentage={loading ? 0 : summary?.nodes?.cpuUsage ?? 0}
+              size={48}
+            />
           </CardContent>
         </Card>
       </div>
@@ -167,11 +206,58 @@ export function KubernetesMetrics() {
 
         <TabsContent value="pods" className="mt-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Pod Metrics</CardTitle>
-              <CardDescription>
-                Resource usage per pod
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle className="text-base font-medium">Pod Metrics</CardTitle>
+                <CardDescription>
+                  Resource usage per pod
+                </CardDescription>
+              </div>
+              
+              {/* Sort button with dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowSortDropdown(!showSortDropdown)}
+                  className="p-2 rounded-md hover:bg-muted"
+                  aria-label="Sort pods"
+                >
+                  <ListFilter className="h-4 w-4" />
+                </button>
+                
+                {/* Dropdown menu */}
+                {showSortDropdown && (
+                  <div className="absolute right-0 top-full mt-1 w-48 rounded-md border bg-card shadow-lg z-10">
+                    <div className="p-2">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Sort by</p>
+                      {[
+                        { value: "name-asc", label: "Name (A-Z)" },
+                        { value: "name-desc", label: "Name (Z-A)" },
+                        { value: "cpu-asc", label: "CPU (Low-High)" },
+                        { value: "cpu-desc", label: "CPU (High-Low)" },
+                        { value: "memory-asc", label: "Memory (Low-High)" },
+                        { value: "memory-desc", label: "Memory (High-Low)" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            const [field, order] = option.value.split("-") as [SortField, SortOrder];
+                            handleSortChange(field, order);
+                            setShowSortDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-sm hover:bg-muted ${
+                            sortField === option.value.split("-")[0] && 
+                            sortOrder === option.value.split("-")[1] 
+                              ? "bg-muted" 
+                              : ""
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -179,7 +265,7 @@ export function KubernetesMetrics() {
                   Loading pod metrics...
                 </div>
               ) : (
-                <PodsTable pods={podsMetrics?.pods || []} />
+                <PodsTable pods={podsMetrics?.pods || []} sortField={sortField} sortOrder={sortOrder} />
               )}
             </CardContent>
           </Card>

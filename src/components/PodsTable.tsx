@@ -15,15 +15,16 @@ import { PodCard } from "./dashboard/ResourceCard";
 
 interface PodsTableProps {
   pods: PodMetrics[];
+  sortField?: "name" | "cpu" | "memory";
+  sortOrder?: "asc" | "desc";
 }
 
-type SortField = "name" | "cpu" | "memory";
-type SortOrder = "asc" | "desc";
-
-export function PodsTable({ pods }: PodsTableProps) {
+export function PodsTable({ 
+  pods, 
+  sortField = "name", 
+  sortOrder = "asc" 
+}: PodsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortField, setSortField] = useState<SortField>("name");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   // Filter pods based on search query
   const filteredPods = pods.filter((pod) =>
@@ -90,24 +91,6 @@ export function PodsTable({ pods }: PodsTableProps) {
             className="w-full pl-10 pr-4 py-2 rounded-md border bg-background text-sm"
           />
         </div>
-        
-        {/* Sort dropdown */}
-        <select
-          value={`${sortField}-${sortOrder}`}
-          onChange={(e) => {
-            const [field, order] = e.target.value.split("-") as [SortField, SortOrder];
-            setSortField(field);
-            setSortOrder(order);
-          }}
-          className="h-9 rounded-md border bg-background px-3 text-sm"
-        >
-          <option value="name-asc">Name (A-Z)</option>
-          <option value="name-desc">Name (Z-A)</option>
-          <option value="cpu-asc">CPU (Low-High)</option>
-          <option value="cpu-desc">CPU (High-Low)</option>
-          <option value="memory-asc">Memory (Low-High)</option>
-          <option value="memory-desc">Memory (High-Low)</option>
-        </select>
       </div>
 
       {/* Mobile View: Card Grid */}
