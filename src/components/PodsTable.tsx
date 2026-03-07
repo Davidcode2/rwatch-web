@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -7,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { PodMetrics } from "@/types/k8s";
-import { UsagePieChart } from "./dashboard/UsagePieChart";
+import { Cpu, MemoryStick } from "lucide-react";
 import { formatResourceValue } from "@/lib/format";
 import { PodCard } from "./dashboard/ResourceCard";
 
@@ -16,6 +18,13 @@ interface PodsTableProps {
 }
 
 export function PodsTable({ pods }: PodsTableProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter pods based on search query
+  const filteredPods = pods.filter((pod) =>
+    pod.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Parse CPU percentage from string (format: "500m (25%)" or "0.5 (25%)")
   const parseCpuPercentage = (cpuStr: string): number => {
     const match = cpuStr.match(/\((\d+(?:\.\d+)?)%?\)/);
@@ -39,14 +48,33 @@ export function PodsTable({ pods }: PodsTableProps) {
 
   return (
     <div className="space-y-4">
+      {/* Search Input */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search pods by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-md border bg-background text-sm"
+          />
+        </div>
+      </div>
+
       {/* Mobile View: Card Grid */}
       <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {pods.map((pod) => (
+        {filteredPods.map((pod) => (
           <PodCard key={`${pod.namespace}-${pod.name}`} pod={pod} />
         ))}
         {pods.length === 0 && (
           <div className="col-span-full text-center py-8 text-muted-foreground">
             No pods found
+          </div>
+        )}
+        {filteredPods.length === 0 && pods.length > 0 && (
+          <div className="col-span-full text-center py-8 text-muted-foreground">
+            No pods match your search
           </div>
         )}
       </div>
@@ -63,7 +91,7 @@ export function PodsTable({ pods }: PodsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pods.map((pod) => {
+            {filteredPods.map((pod) => {
               const cpuPercentage = parseCpuPercentage(pod.cpu);
               const memoryPercentage = parseMemoryPercentage(pod.memory);
               const cpuUsage = extractCpuUsage(pod.cpu);
@@ -74,29 +102,19 @@ export function PodsTable({ pods }: PodsTableProps) {
                   <TableCell className="font-medium">{pod.name}</TableCell>
                   <TableCell>{pod.namespace}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <UsagePieChart percentage={cpuPercentage} size={32} />
-                      <div className="flex flex-col">
-                        <span className="font-mono text-sm">
-                          {formatResourceValue(cpuUsage, 'cpu')}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {cpuPercentage.toFixed(1)}%
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Cpu className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-mono text-sm">
+                        {formatResourceValue(cpuUsage, 'cpu')}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <UsagePieChart percentage={memoryPercentage} size={32} />
-                      <div className="flex flex-col">
-                        <span className="font-mono text-sm">
-                          {formatResourceValue(memoryUsage, 'memory')}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {memoryPercentage.toFixed(1)}%
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <MemoryStick className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-mono text-sm">
+                        {formatResourceValue(memoryUsage, 'memory')}
+                      </span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -106,6 +124,13 @@ export function PodsTable({ pods }: PodsTableProps) {
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">
                   No pods found
+                </TableCell>
+              </TableRow>
+            )}
+            {filteredPods.length === 0 && pods.length > 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-4 text-muted-foreground">
+                  No pods match your search
                 </TableCell>
               </TableRow>
             )}

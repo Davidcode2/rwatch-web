@@ -80,7 +80,8 @@ export function KubernetesMetrics() {
               Historical CPU and memory usage trends
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          {/* Desktop toggle - hidden on mobile */}
+          <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => setChartMetric("cpu")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -108,6 +109,21 @@ export function KubernetesMetrics() {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Mobile toggle - shown only on mobile */}
+          <div className="md:hidden mb-4">
+            <Tabs value={chartMetric} onValueChange={(v) => setChartMetric(v as "cpu" | "memory")}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="cpu" className="flex items-center gap-1.5">
+                  <Cpu className="h-3.5 w-3.5" />
+                  CPU
+                </TabsTrigger>
+                <TabsTrigger value="memory" className="flex items-center gap-1.5">
+                  <HardDrive className="h-3.5 w-3.5" />
+                  Memory
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
           <K8sMetricsChart
             history={history}
             metric={chartMetric}

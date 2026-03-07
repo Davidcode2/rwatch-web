@@ -34,26 +34,28 @@ export function K8sMetricsChart({ history = [], metric, loading }: K8sMetricsCha
     value: metric === "cpu" ? point.cpuUsage : point.memoryUsage,
   }));
 
-  const color = metric === "cpu" ? "hsl(var(--chart-1))" : "hsl(var(--chart-2))";
+  const color = metric === "cpu" ? "#3b82f6" : "#10b981";
   const label = metric === "cpu" ? "CPU Usage" : "Memory Usage";
   const unit = "%";
 
   return (
     <div className="w-full h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <LineChart data={data} margin={{ top: 5, right: 10, left: (typeof window !== "undefined" && window.innerWidth < 768) ? 0 : 10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" vertical={false} />
           <XAxis
             dataKey="time"
-            tick={{ fill: "currentColor", fontSize: 12 }}
-            tickLine={{ stroke: "currentColor" }}
-            axisLine={{ stroke: "currentColor" }}
+            tick={{ fill: "currentColor", fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+            dy={8}
           />
           <YAxis
-            tick={{ fill: "currentColor", fontSize: 12 }}
-            tickLine={{ stroke: "currentColor" }}
-            axisLine={{ stroke: "currentColor" }}
-            tickFormatter={(value) => `${value.toFixed(1)}${unit}`}
+            tick={{ fill: "currentColor", fontSize: 11 }}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `${value}${unit}`}
+            dx={-8}
             domain={[0, 100]}
           />
           <Tooltip
@@ -74,8 +76,10 @@ export function K8sMetricsChart({ history = [], metric, loading }: K8sMetricsCha
             dataKey="value"
             stroke={color}
             strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
             dot={false}
-            activeDot={{ r: 6 }}
+            activeDot={{ r: 6, fill: color, strokeWidth: 2, stroke: "#fff" }}
           />
         </LineChart>
       </ResponsiveContainer>

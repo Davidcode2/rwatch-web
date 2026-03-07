@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsagePieChart } from './UsagePieChart';
 import { formatResourceValue, getUsageBadgeClass } from '@/lib/format';
 import type { NodeMetrics, PodMetrics } from '@/types/k8s';
+import { Cpu, MemoryStick } from "lucide-react";
 
 interface ResourceCardProps {
   name: string;
@@ -98,26 +99,43 @@ interface PodCardProps {
 }
 
 export function PodCard({ pod }: PodCardProps) {
-  // Parse CPU percentage from string (format: "500m (25%)")
-  const parseCpuPercentage = (cpuStr: string): number => {
-    const match = cpuStr.match(/\((\d+(?:\.\d+)?)%?\)/);
-    return match ? parseFloat(match[1]) : 0;
-  };
-
-  // Parse Memory percentage from string (format: "1Gi (50%)")
-  const parseMemoryPercentage = (memStr: string): number => {
-    const match = memStr.match(/\((\d+(?:\.\d+)?)%?\)/);
-    return match ? parseFloat(match[1]) : 0;
-  };
-
   return (
-    <ResourceCard
-      name={pod.name}
-      namespace={pod.namespace}
-      cpuUsage={pod.cpu}
-      cpuPercentage={parseCpuPercentage(pod.cpu)}
-      memoryUsage={pod.memory}
-      memoryPercentage={parseMemoryPercentage(pod.memory)}
-    />
+    <Card className="w-full">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-semibold truncate flex items-center justify-between">
+          <span className="truncate">{pod.name}</span>
+          <span className="text-xs font-normal text-muted-foreground">
+            {pod.namespace}
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* CPU Row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Cpu className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <div className="text-sm text-muted-foreground">CPU</div>
+              <div className="font-mono text-sm">
+                {formatResourceValue(pod.cpu, 'cpu')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Memory Row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MemoryStick className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <div className="text-sm text-muted-foreground">Memory</div>
+              <div className="font-mono text-sm">
+                {formatResourceValue(pod.memory, 'memory')}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
